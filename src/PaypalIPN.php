@@ -22,7 +22,6 @@ class PaypalIPN
     /** Response from PayPal indicating validation failed */
     const INVALID = 'INVALID';
 
-
     /**
      * Sets the IPN verification to sandbox mode (for use when testing,
      * should not be enabled in production).
@@ -43,7 +42,6 @@ class PaypalIPN
         $this->useLocalCerts = false;
     }
 
-
     /**
      * Determine endpoint to post the verification data to.
      * @return string
@@ -57,7 +55,6 @@ class PaypalIPN
         }
     }
 
-
     /**
      * Verification Function
      * Sends the incoming post data back to PayPal using the cURL library.
@@ -65,7 +62,7 @@ class PaypalIPN
      * @return bool
      * @throws Exception
      */
-    function verifyIPN()
+    public function verifyIPN()
     {
         if (!count($_POST)) {
             throw new Exception("Missing POST Data");
@@ -86,16 +83,8 @@ class PaypalIPN
             }
         }
         $req = 'cmd=_notify-validate';
-        $get_magic_quotes_exists = false;
-        if (function_exists('get_magic_quotes_gpc')) {
-            $get_magic_quotes_exists = true;
-        }
         foreach ($myPost as $key => $value) {
-            if ($get_magic_quotes_exists == true && get_magic_quotes_gpc() == 1) {
-                $value = urlencode(stripslashes($value));
-            } else {
-                $value = urlencode($value);
-            }
+            $value = urlencode($value);
             $req .= "&$key=$value";
         }
 
@@ -112,10 +101,10 @@ class PaypalIPN
         }
         curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'User-Agent: PHP-IPN-Verification-Script',
             'Connection: Close',
-        ));
+        ]);
         $res = curl_exec($ch);
         $info = curl_getinfo($ch);
         $http_code = $info['http_code'];
@@ -138,4 +127,3 @@ class PaypalIPN
         }
     }
 }
-
